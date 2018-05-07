@@ -8,5 +8,6 @@ flags = tf.app.flags
 #####################
 flags.DEFINE_string('dataset', 'mnist', 'name of dataset [mnist]')
 flags.DEFINE_boolean('is_training', True, 'train or predict phase')
+flags.DEFINE_integer('batch_size', 50, 'batch size')
 
 cfg = tf.app.flags.FLAGS
