@@ -25,32 +25,9 @@ def safe_norm(s, axis=-1, epsilon=1e-7, keep_dims=False, name=None):
         return tf.sqrt(squared_norm + epsilon)
 class CapsNet:
     def __init__(self):
-        
-        tf.reset_default_graph()
-        np.random.seed(42)
-        tf.set_random_seed(42)
-
-
-
-    
-        # n_samples = 15
-
-        # plt.figure(figsize=(n_samples * 2, 3))
-        # for index in range(n_samples):
-        #     plt.subplot(1, n_samples, index + 1)
-        #     sample_image = mnist.train.images[index].reshape(28, 28)
-        #     plt.imshow(sample_image, cmap="binary")
-        #     plt.axis("off")
-
-        # plt.show()
-
-        # mnist.train.labels[:n_samples]
-
-
         #placeholder na literki 28x28 pixeli
         self.X = tf.placeholder(shape=[None, 28, 28, 1], dtype=tf.float32, name="X")
 
-        #The first layer will be composed of 32 maps of 6×6 capsules each, where each capsule will output an 8D activation vector:
         caps1_n_maps = 32
         caps1_n_caps = caps1_n_maps * 6 * 6  # 1152 primary capsules
         caps1_n_dims = 8
@@ -74,8 +51,6 @@ class CapsNet:
 
         conv1 = tf.layers.conv2d(self.X, name="conv1", **conv1_params)
         conv2 = tf.layers.conv2d(conv1, name="conv2", **conv2_params)
-        #Note: since we used a kernel size of 9 and no padding (for some reason, that's what `"valid"` means), the image shrunk by 9-1=8 pixels after each convolutional layer (28×28 to 20×20, then 20×20 to 12×12), and since we used a stride of 2 in the second convolutional layer, the image size was divided by 2. This is how we end up with 6×6 feature maps.
-        #Next, we reshape the output to get a bunch of 8D vectors representing the outputs of the primary capsules. The output of `conv2` is an array containing 32×8=256 feature maps for each instance, where each feature map is 6×6. So the shape of this output is (_batch size_, 6, 6, 256). We want to chop the 256 into 32 vectors of 8 dimensions each. We could do this by reshaping to (_batch size_, 6, 6, 32, 8). However, since this first capsule layer will be fully connected to the next capsule layer, we can simply flatten the 6×6 grids. This means we just need to reshape to (_batch size_, 6×6×32, 8).
 
         caps1_raw = tf.reshape(conv2, [-1, caps1_n_caps, caps1_n_dims],name="caps1_raw")
 
