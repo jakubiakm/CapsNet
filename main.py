@@ -35,7 +35,6 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
         best_loss_val = np.infty
         saver = tf.train.Saver()
         checkpoint_path = u.get_checkpoint_path()
-        print(checkpoint_path)
         init = tf.global_variables_initializer()
         if cfg.use_checkpoint and tf.train.checkpoint_exists(checkpoint_path):
             saver.restore(sess, checkpoint_path)
@@ -87,8 +86,8 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
 def validate(data, model):
     n_iterations_test = data.test.num_examples // cfg.batch_size
     saver = tf.train.Saver()
-    checkpoint_path = "./my_capsule_network"
-
+    checkpoint_path = u.get_checkpoint_path()
+        
     with tf.Session() as sess:
         saver.restore(sess, checkpoint_path)
 
@@ -112,7 +111,8 @@ def validate(data, model):
             acc_test * 100, loss_test))
 
 def show_images(data, model):
-    checkpoint_path = "./my_capsule_network"
+    checkpoint_path = u.get_checkpoint_path()
+        
 
     n_samples = 5
 
