@@ -6,18 +6,17 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+import utils as u
 
 from capsNet import CapsNet
 
 from config import cfg
-from utils import load_data
 
 
 
 
 def main(_):
-    data = load_data(cfg.dataset, cfg.batch_size, True)
-    print(cfg.is_training)
+    data = u.load_data(cfg.dataset, cfg.batch_size, True)
     model = CapsNet()
     n_epochs = 100
     
@@ -35,8 +34,8 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
     with tf.Session() as sess:
         best_loss_val = np.infty
         saver = tf.train.Saver()
-        checkpoint_path = "./my_capsule_network"
-
+        checkpoint_path = u.get_checkpoint_path()
+        print(checkpoint_path)
         init = tf.global_variables_initializer()
         if cfg.use_checkpoint and tf.train.checkpoint_exists(checkpoint_path):
             saver.restore(sess, checkpoint_path)

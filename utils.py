@@ -1,6 +1,7 @@
 import tensorflow as tf
 
 from tensorflow.examples.tutorials.mnist import input_data
+from config import cfg
 
 def load_mnist(batch_size, is_training=True):
     return input_data.read_data_sets("/tmp/data/")
@@ -11,6 +12,8 @@ def load_data(dataset, batch_size, is_training=True):
     else:
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
+def get_checkpoint_path():
+    return "./checkpoints/" + "mnist" + "/capsule_network"
 
 def squash(s, axis=-1, epsilon=1e-7, name=None):
     with tf.name_scope(name, default_name="squash"):
