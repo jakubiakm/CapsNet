@@ -5,24 +5,12 @@ import logging
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
+import utils as u
 
 from config import cfg
-from utils import load_data
 
-def squash(s, axis=-1, epsilon=1e-7, name=None):
-    with tf.name_scope(name, default_name="squash"):
-        squared_norm = tf.reduce_sum(tf.square(s), axis=axis,
-                                    keep_dims=True)
-        safe_norm = tf.sqrt(squared_norm + epsilon)
-        squash_factor = squared_norm / (1. + squared_norm)
-        unit_vector = s / safe_norm
-        return squash_factor * unit_vector
 
-def safe_norm(s, axis=-1, epsilon=1e-7, keep_dims=False, name=None):
-    with tf.name_scope(name, default_name="safe_norm"):
-        squared_norm = tf.reduce_sum(tf.square(s), axis=axis,
-                                    keep_dims=keep_dims)
-        return tf.sqrt(squared_norm + epsilon)
+
 class CapsNet:
     def __init__(self):
         #placeholder na literki 28x28 pixeli
@@ -54,7 +42,7 @@ class CapsNet:
 
         caps1_raw = tf.reshape(conv2, [-1, caps1_n_caps, caps1_n_dims],name="caps1_raw")
 
-        caps1_output = squash(caps1_raw, name="caps1_output")
+        caps1_output = u.squash(caps1_raw, name="caps1_output")
 
         init_sigma = 0.1
 
@@ -87,7 +75,7 @@ class CapsNet:
                                         name="weighted_predictions")
         weighted_sum = tf.reduce_sum(weighted_predictions, axis=1, keep_dims=True,
                                     name="weighted_sum")
-        caps2_output_round_1 = squash(weighted_sum, axis=-2,
+        caps2_output_round_1 = u.squash(weighted_sum, axis=-2,
                                     name="caps2_output_round_1")
 
         caps2_output_round_1_tiled = tf.tile(
@@ -109,13 +97,13 @@ class CapsNet:
         weighted_sum_round_2 = tf.reduce_sum(weighted_predictions_round_2,
                                             axis=1, keep_dims=True,
                                             name="weighted_sum_round_2")
-        caps2_output_round_2 = squash(weighted_sum_round_2,
+        caps2_output_round_2 = u.squash(weighted_sum_round_2,
                                     axis=-2,
                                     name="caps2_output_round_2")
 
         self.caps2_output = caps2_output_round_2
 
-        y_proba = safe_norm(self.caps2_output, axis=-2, name="y_proba")
+        y_proba = u.safe_norm(self.caps2_output, axis=-2, name="y_proba")
 
         y_proba_argmax = tf.argmax(y_proba, axis=2, name="y_proba")
 
@@ -129,7 +117,7 @@ class CapsNet:
 
         T = tf.one_hot(self.y, depth=caps2_n_caps, name="T")
 
-        caps2_output_norm = safe_norm(self.caps2_output, axis=-2, keep_dims=True,
+        caps2_output_norm = u.safe_norm(self.caps2_output, axis=-2, keep_dims=True,
                                     name="caps2_output_norm")
 
         present_error_raw = tf.square(tf.maximum(0., m_plus - caps2_output_norm),

@@ -18,7 +18,6 @@ from utils import load_data
 def main(_):
     data = load_data(cfg.dataset, cfg.batch_size, True)
     print(cfg.is_training)
-
     model = CapsNet()
     n_epochs = 100
     
@@ -28,7 +27,7 @@ def main(_):
         train(True, n_epochs, n_iterations_per_epoch, n_iterations_validation, data, model)  
     else:
         validate(data, model)
-    show_images(data, model)
+    #show_images(data, model)
     
 
 
@@ -39,7 +38,7 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
         checkpoint_path = "./my_capsule_network"
 
         init = tf.global_variables_initializer()
-        if restore_checkpoint and tf.train.checkpoint_exists(checkpoint_path):
+        if cfg.use_checkpoint and tf.train.checkpoint_exists(checkpoint_path):
             saver.restore(sess, checkpoint_path)
         else:
             init.run()
