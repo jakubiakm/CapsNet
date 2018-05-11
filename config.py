@@ -6,7 +6,7 @@ flags = tf.app.flags
 #####################
 #command prompt flags
 #####################
-flags.DEFINE_string('dataset', 'mnist', 'name of dataset [mnist]')
+flags.DEFINE_string('dataset', 'mnist', 'name of dataset [mnist, fashion_mnist]')
 flags.DEFINE_boolean('is_training', True, 'train or predict phase')
 flags.DEFINE_integer('batch_size', 50, 'batch size')
 flags.DEFINE_integer('epochs', 100, 'number of epochs')

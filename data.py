@@ -1,6 +1,7 @@
 import numpy
 import gzip
 import tensorflow as tf
+from keras.datasets import fashion_mnist
 
 class Data(object):
     def __init__(self, train_images, train_labels, test_images, test_labels):
@@ -85,6 +86,8 @@ class DataSet(object):
 def load_data(dataset):
     if dataset == 'mnist':
         return load_mnist()
+    if dataset == 'fashion_mnist':
+        return load_fashion_mnist()
     else:
         raise Exception('Invalid dataset, please check the name of dataset:', dataset)
 
@@ -92,6 +95,16 @@ def load_mnist():
     img_size = 784
     train_images, train_labels = tf.keras.datasets.mnist.load_data()[0]
     test_images, test_labels = tf.keras.datasets.mnist.load_data()[1]
+    train_images = train_images.reshape(-1, img_size)
+    train_images = numpy.multiply(train_images, 1.0 / 255.0)
+    test_images = test_images.reshape(-1, img_size)
+    test_images = numpy.multiply(test_images, 1.0 / 255.0)
+    return Data(train_images, train_labels, test_images, test_labels)
+
+def load_fashion_mnist():
+    img_size = 784
+    train_images, train_labels = fashion_mnist.load_data()[0]
+    test_images, test_labels = fashion_mnist.load_data()[1]
     train_images = train_images.reshape(-1, img_size)
     train_images = numpy.multiply(train_images, 1.0 / 255.0)
     test_images = test_images.reshape(-1, img_size)
