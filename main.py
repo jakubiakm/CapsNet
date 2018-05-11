@@ -1,25 +1,18 @@
 from __future__ import division, print_function, unicode_literals
 import tensorflow as tf
 import logging
-
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-
 import utils as u
-
+import data as d
 from capsNet import CapsNet
-
 from config import cfg
 
-
-
-
 def main(_):
-    data = u.load_data(cfg.dataset, cfg.batch_size, True)
+    data = d.load_mnist()
     model = CapsNet()
-    n_epochs = 100
-    
+    n_epochs = cfg.epochs
     n_iterations_per_epoch = data.train.num_examples // cfg.batch_size
     n_iterations_validation = data.validation.num_examples // cfg.batch_size
     if(cfg.is_training):
@@ -28,8 +21,6 @@ def main(_):
         validate(data, model)
     #show_images(data, model)
     
-
-
 def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_validation, data, model):
     with tf.Session() as sess:
         best_loss_val = np.infty
@@ -113,7 +104,6 @@ def validate(data, model):
 def show_images(data, model):
     checkpoint_path = u.get_checkpoint_path()
         
-
     n_samples = 5
 
     sample_images = data.test.images[:n_samples].reshape([-1, 28, 28, 1])
