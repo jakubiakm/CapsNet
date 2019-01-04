@@ -1,7 +1,7 @@
 import numpy
 import gzip
 import tensorflow as tf
-from keras.datasets import fashion_mnist
+from keras.datasets import fashion_mnist, mnist
 
 class Data(object):
     def __init__(self, train_images, train_labels, test_images, test_labels):
@@ -83,30 +83,63 @@ class DataSet(object):
             end = self._index_in_epoch
             return self._images[start:end], self._labels[start:end]
 
-def load_data(dataset):
-    if dataset == 'mnist':
-        return load_mnist()
-    if dataset == 'fashion_mnist':
-        return load_fashion_mnist()
+def load_data(dataset_type, extended_dataset):
+    if dataset_type in ('mnist', 'fashion_mnist'):
+        if extended_dataset:
+            return load_extended_dataset(dataset_type)
+        else:
+            return load_dataset(dataset_type)
     else:
-        raise Exception('Invalid dataset, please check the name of dataset:', dataset)
+        raise Exception('Invalid dataset, please check the name of dataset:', dataset_type)
 
-def load_mnist():
-    img_size = 784
-    train_images, train_labels = tf.keras.datasets.mnist.load_data()[0]
-    test_images, test_labels = tf.keras.datasets.mnist.load_data()[1]
-    train_images = train_images.reshape(-1, img_size)
-    train_images = numpy.multiply(train_images, 1.0 / 255.0)
-    test_images = test_images.reshape(-1, img_size)
-    test_images = numpy.multiply(test_images, 1.0 / 255.0)
+
+def get_dataset_from_type(dataset_type):
+    if dataset_type == "mnist":
+        return mnist.load_data()
+    elif dataset_type == "fashion_mnist":
+        return fashion_mnist.load_data()
+    else:
+        raise Exception('Invalid dataset, please check the name of dataset:', dataset_type)
+
+
+def reshape_normalize_dataset(dataset, array_size):
+    dataset = dataset.reshape(-1, array_size)
+    dataset = numpy.multiply(dataset, 1.0 / 255.0)
+
+    return dataset
+
+
+def load_dataset(dataset_type):
+    dataset = get_dataset_from_type(dataset_type)
+
+    # train data -> data -> first element
+    img_size = dataset[0][0][0].size
+
+    train_images, train_labels = dataset[0]
+    test_images, test_labels = dataset[1]
+
+    train_images = reshape_normalize_dataset(train_images, img_size)
+    test_images = reshape_normalize_dataset(test_images, img_size)
+
     return Data(train_images, train_labels, test_images, test_labels)
 
-def load_fashion_mnist():
-    img_size = 784
-    train_images, train_labels = fashion_mnist.load_data()[0]
-    test_images, test_labels = fashion_mnist.load_data()[1]
-    train_images = train_images.reshape(-1, img_size)
-    train_images = numpy.multiply(train_images, 1.0 / 255.0)
-    test_images = test_images.reshape(-1, img_size)
-    test_images = numpy.multiply(test_images, 1.0 / 255.0)
+
+def load_extended_dataset(dataset_type):
+    dataset = get_dataset_from_type(dataset_type)
+
+    # train data -> data -> first element
+    img_size = dataset[0][0][0].size
+
+    train_images, train_labels = dataset[0]
+    test_images, test_labels = dataset[1]
+
+    new_shape = list()
+    new_shape.append(train_images.shape[0] * 4)
+    new_shape = new_shape + list(train_images.shape[1:])
+
+    #TODO: moving / rotating
+
+    train_images = reshape_normalize_dataset(train_images, img_size)
+    test_images = reshape_normalize_dataset(test_images, img_size)
+
     return Data(train_images, train_labels, test_images, test_labels)

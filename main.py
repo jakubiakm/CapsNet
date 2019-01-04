@@ -10,7 +10,7 @@ from capsNet import CapsNet
 from config import cfg
 
 def main(_):
-    data = d.load_data(cfg.dataset)
+    data = d.load_data(cfg.dataset, cfg.extended_dataset)
     model = CapsNet()
     n_epochs = cfg.epochs
     n_iterations_per_epoch = data.train.num_examples // cfg.batch_size
