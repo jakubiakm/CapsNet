@@ -8,9 +8,10 @@ import utils as u
 import data as d
 from capsNet import CapsNet
 from config import cfg
+import tqdm
 
 def main(_):
-    data = d.load_data(cfg.dataset, cfg.extended_dataset)
+    data = d.load_data(cfg)
     model = CapsNet()
     n_epochs = cfg.epochs
     n_iterations_per_epoch = data.train.num_examples // cfg.batch_size
@@ -33,7 +34,9 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
             init.run()
 
         for epoch in range(n_epochs):
-            for iteration in range(1, n_iterations_per_epoch + 1):
+            trange = tqdm.trange(1, n_iterations_per_epoch + 1)
+
+            for iteration in trange:
                 X_batch, y_batch = data.train.next_batch(cfg.batch_size)
                 # Run the training operation and measure the loss:
                 _, loss_train = sess.run(
@@ -41,11 +44,11 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
                     feed_dict={model.X: X_batch.reshape([-1, 28, 28, 1]),
                             model.y: y_batch,
                             model.mask_with_labels: True})
-                print("\rIteration: {}/{} ({:.1f}%)  Loss: {:.5f}".format(
-                        iteration, n_iterations_per_epoch,
-                        iteration * 100 / n_iterations_per_epoch,
-                        loss_train),
-                    end="")
+                # print("\rIteration: {}/{} ({:.1f}%)  Loss: {:.5f}".format(
+                #         iteration, n_iterations_per_epoch,
+                #         iteration * 100 / n_iterations_per_epoch,
+                #         loss_train),
+                #     end="")
 
             # At the end of each epoch,
             # measure the validation loss and accuracy:

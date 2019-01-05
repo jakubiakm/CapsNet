@@ -12,6 +12,6 @@ flags.DEFINE_integer('batch_size', 50, 'batch size')
 flags.DEFINE_integer('epochs', 100, 'number of epochs')
 flags.DEFINE_boolean('use_checkpoint', True, 'restore model from checkpoint')
 flags.DEFINE_boolean('extended_dataset', True, 'use extended models (with rotations and repositioning)')
-
+flags.DEFINE_string('extension_type', "both", 'extend dataset by operation: {rotation, shift, both}')
 
 cfg = tf.app.flags.FLAGS
