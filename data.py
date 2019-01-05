@@ -3,12 +3,17 @@ import gzip
 import tensorflow as tf
 from keras.datasets import fashion_mnist, mnist
 from scipy.ndimage import rotate, shift
+from math import sqrt
 
 class Data(object):
     def __init__(self, train_images, train_labels, test_images, test_labels):
         self._train = DataSet(train_images, train_labels)
         self._test = DataSet(test_images, test_labels)
 
+        assert self._train.images[0].size == self._test.images[0].size, \
+        ('train_images.shape: %s test_images.shape: %s' % (self._train.images.shape, self._test.images.shape))
+        # silently we think here that all images have the same x and y dimension length
+        self._image_axis_size = int(sqrt(self._train.images[0].size))
     @property
     def train(self):
         return self._train
@@ -20,6 +25,10 @@ class Data(object):
     @property
     def validation(self):
         return self._test
+
+    @property
+    def image_axis_size(self):
+        return self._image_axis_size
 
 class DataSet(object):
     def __init__(self, images, labels):
@@ -129,7 +138,7 @@ def load_dataset(dataset_type):
 
 
 def get_parameters_for_extension_type(extension_type):
-    multiplier = {'rotation': 3, 'shift': 4, 'both': 7, 'none': 1}
+    multiplier = {'rotation': 3, 'shift': 5, 'both': 8, 'none': 1}
 
     return multiplier[extension_type]
 
@@ -141,7 +150,7 @@ def crop_image(image, axis_size):
 def get_nth_image_from_operation(image, label, extension_type, j):
     axis_size = image.shape[0]
     rotations = [0.0, -5.0, 5.0]
-    shifts = [(-5, 0), (5, 0), (0, -5), (0, 5)]
+    shifts = [(-5, 0), (5, 0), (0, 0), (0, -5), (0, 5)]
 
     out_image = None
 

@@ -12,9 +12,9 @@ from config import cfg
 
 
 class CapsNet:
-    def __init__(self):
+    def __init__(self, image_axis_size):
         #placeholder na literki 28x28 pixeli
-        self.X = tf.placeholder(shape=[None, 28, 28, 1], dtype=tf.float32, name="X")
+        self.X = tf.placeholder(shape=[None, image_axis_size, image_axis_size, 1], dtype=tf.float32, name="X")
 
         caps1_n_maps = 32
         caps1_n_caps = caps1_n_maps * 6 * 6  # 1152 primary capsules
@@ -161,7 +161,7 @@ class CapsNet:
 
         n_hidden1 = 512
         n_hidden2 = 1024
-        n_output = 28 * 28
+        n_output = image_axis_size * image_axis_size
 
         with tf.name_scope("decoder"):
             hidden1 = tf.layers.dense(decoder_input, n_hidden1,

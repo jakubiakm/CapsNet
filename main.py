@@ -12,7 +12,7 @@ import tqdm
 
 def main(_):
     data = d.load_data(cfg)
-    model = CapsNet()
+    model = CapsNet(data.image_axis_size)
     n_epochs = cfg.epochs
     n_iterations_per_epoch = data.train.num_examples // cfg.batch_size
     n_iterations_validation = data.validation.num_examples // cfg.batch_size
@@ -41,7 +41,7 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
                 # Run the training operation and measure the loss:
                 _, loss_train = sess.run(
                     [model.training_op, model.loss],
-                    feed_dict={model.X: X_batch.reshape([-1, 28, 28, 1]),
+                    feed_dict={model.X: X_batch.reshape([-1, data.image_axis_size, data.image_axis_size, 1]),
                             model.y: y_batch,
                             model.mask_with_labels: True})
                 # print("\rIteration: {}/{} ({:.1f}%)  Loss: {:.5f}".format(
@@ -58,7 +58,7 @@ def train(restore_checkpoint, n_epochs, n_iterations_per_epoch, n_iterations_val
                 X_batch, y_batch = data.validation.next_batch(cfg.batch_size)
                 loss_val, acc_val = sess.run(
                         [model.loss, model.accuracy],
-                        feed_dict={model.X: X_batch.reshape([-1, 28, 28, 1]),
+                        feed_dict={model.X: X_batch.reshape([-1, data.image_axis_size, data.image_axis_size, 1]),
                                 model.y: y_batch})
                 loss_vals.append(loss_val)
                 acc_vals.append(acc_val)
@@ -91,7 +91,7 @@ def validate(data, model):
             X_batch, y_batch = data.test.next_batch(cfg.batch_size)
             loss_test, acc_test = sess.run(
                     [model.loss, model.accuracy],
-                    feed_dict={model.X: X_batch.reshape([-1, 28, 28, 1]),
+                    feed_dict={model.X: X_batch.reshape([-1, data.image_axis_size, data.image_axis_size, 1]),
                             model.y: y_batch})
             loss_tests.append(loss_test)
             acc_tests.append(acc_test)
@@ -109,7 +109,7 @@ def show_images(data, model):
         
     n_samples = 5
 
-    sample_images = data.test.images[:n_samples].reshape([-1, 28, 28, 1])
+    sample_images = data.test.images[:n_samples].reshape([-1, data.image_axis_size, data.image_axis_size, 1])
 
     with tf.Session() as sess:
         model.saver.restore(sess, checkpoint_path)
@@ -118,8 +118,8 @@ def show_images(data, model):
                 [model.caps2_output, model.decoder_output, model.y_pred],
                 feed_dict={model.X: sample_images,
                         model.y: np.array([], dtype=np.int64)})
-        sample_images = sample_images.reshape(-1, 28, 28)
-        reconstructions = decoder_output_value.reshape([-1, 28, 28])
+        sample_images = sample_images.reshape(-1, data.image_axis_size, data.image_axis_size)
+        reconstructions = decoder_output_value.reshape([-1, data.image_axis_size, data.image_axis_size])
 
         plt.figure(figsize=(n_samples * 2, 3))
         for index in range(n_samples):
